@@ -11,7 +11,7 @@ environment:
 
 dependencies:
   ridesafe_core:
-    path: D:/dev/ridesafe/ridesafe_core
+    git: https://github.com/splitscale/ridesafe_core.git
 
   flutter_bluetooth_serial: ^0.4.0
 

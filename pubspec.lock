@@ -261,9 +261,11 @@ packages:
   ridesafe_core:
     dependency: "direct main"
     description:
-      path: "D:/dev/ridesafe/ridesafe_core"
-      relative: false
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: "18768e5a046fc1a01ca1d6f0f6e8d56ba141f69c"
+      url: "https://github.com/splitscale/ridesafe_core.git"
+    source: git
     version: "1.0.0"
   shelf:
     dependency: transitive
