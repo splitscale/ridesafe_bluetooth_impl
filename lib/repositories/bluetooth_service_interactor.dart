@@ -1,62 +1,131 @@
+import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:ridesafe_core/device/device.dart';
 import 'package:ridesafe_core/connected_device/connected_device.dart';
+import 'package:ridesafe_core/exceptions/service_exception.dart';
 import 'package:ridesafe_core/services/device_service.dart';
 import 'package:ridesafe_core/services/state/service_state.dart';
 
 /// bluetooth specific implementation
-// TODO: implement bluetooth serial
 class BluetoothServiceInteractor implements DeviceService {
+  final FlutterBluetoothSerial _serial;
+
+  BluetoothServiceInteractor(this._serial);
+
   @override
-  Future<ConnectedDevice> connect(String deviceMacAddress) {
-    // TODO: implement connect
-    throw UnimplementedError();
+  Future<ConnectedDevice> connect(Device device) async {
+    try {
+      final BluetoothConnection conn =
+          await BluetoothConnection.toAddress(device.address);
+
+      return ConnectedDevice.fromDevice(device, conn);
+    } catch (e) {
+      throw ServiceException('Error while connecting the device: $e');
+    }
   }
 
   @override
-  Future<List<Device>> getPairedDevices() {
-    // TODO: implement getPairedDevices
-    throw UnimplementedError();
+  Future<List<Device>> getPairedDevices() async {
+    try {
+      List<BluetoothDevice> devices = await _serial.getBondedDevices();
+
+      return devices
+          .map((e) => Device(
+                e.name.toString(),
+                e.address.toString(),
+              ))
+          .toList();
+    } catch (e) {
+      throw ServiceException('Error while getting paired devices: $e');
+    }
   }
 
   @override
-  Future<ServiceStatus> getServiceState() {
-    // TODO: implement getServiceState
-    throw UnimplementedError();
+  Future<ServiceStatus> getServiceState() async {
+    try {
+      final state = await _serial.state;
+
+      return ServiceStatus<BluetoothState>(state);
+    } catch (e) {
+      throw ServiceException('Error while getting service state: $e');
+    }
   }
 
   @override
-  Future<bool> isPaired(String deviceMacAddress) {
-    // TODO: implement isPaired
-    throw UnimplementedError();
+  Future<bool> isPaired(Device device) async {
+    try {
+      final BluetoothBondState state =
+          await _serial.getBondStateForAddress(device.address);
+
+      return state.isBonded;
+    } catch (e) {
+      throw ServiceException('Error while getting paired state: $e');
+    }
   }
 
   @override
-  Future<bool> isServiceAvailable() {
-    // TODO: implement isServiceAvailable
-    throw UnimplementedError();
+  Future<bool> isServiceAvailable() async {
+    try {
+      return await _serial.isAvailable ?? false;
+    } catch (e) {
+      throw ServiceException('Failed to get service available state: $e');
+    }
   }
 
   @override
-  Future<bool> isServiceEnabled() {
-    // TODO: implement isServiceEnabled
-    throw UnimplementedError();
+  Future<bool> isServiceEnabled() async {
+    try {
+      return await _serial.isEnabled ?? false;
+    } catch (e) {
+      throw ServiceException('Failed to get service enabled state: $e');
+    }
   }
 
   @override
-  Future<bool> pair(String deviceMacAddress, String pin) {
-    // TODO: implement pair
-    throw UnimplementedError();
+  Future<bool> pair(Device device, String pin) async {
+    try {
+      return await _serial.bondDeviceAtAddress(device.address, pin: pin) ??
+          false;
+    } catch (e) {
+      throw ServiceException('Failed pairing attempt: $e');
+    }
   }
 
   @override
   Stream<Device> startScanning() {
-    // TODO: implement startScanning
-    throw UnimplementedError();
+    try {
+      return _serial.startDiscovery().map((e) => Device(
+            e.device.name.toString(),
+            e.device.address.toString(),
+          ));
+    } catch (e) {
+      throw ServiceException('Failed to start scan: $e');
+    }
   }
 
   @override
   Future<void> stopScanning() {
-    // TODO: implement stopScanning
-    throw UnimplementedError();
+    try {
+      return _serial.cancelDiscovery();
+    } catch (e) {
+      throw ServiceException('Failed stop scan: $e');
+    }
+  }
+
+  @override
+  Future<void> enableService() {
+    try {
+      return _serial.requestEnable();
+    } catch (e) {
+      throw ServiceException('Failed to enable service: $e');
+    }
+  }
+
+  @override
+  Future<void> openInternalSettings() {
+    try {
+      return _serial.openSettings();
+    } catch (e) {
+      throw ServiceException('Failed failed to open device settings: $e');
+    }
   }
 }
