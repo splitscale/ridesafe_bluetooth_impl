@@ -32,6 +32,7 @@ class BluetoothServiceInteractor
           .map((e) => Device(
                 e.name.toString(),
                 e.address.toString(),
+                true,
               ))
           .toList();
     } catch (e) {
@@ -94,6 +95,7 @@ class BluetoothServiceInteractor
       return _serial.startDiscovery().map((e) => Device(
             e.device.name.toString(),
             e.device.address.toString(),
+            false,
           ));
     } catch (e) {
       throw ServiceException('Failed to start scan: $e');
