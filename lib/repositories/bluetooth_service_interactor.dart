@@ -6,13 +6,13 @@ import 'package:ridesafe_core/services/device_service.dart';
 
 /// bluetooth specific implementation
 class BluetoothServiceInteractor
-    implements DeviceService<Future<BluetoothState>> {
+    implements DeviceService<Future<BluetoothState>, BluetoothConnection> {
   final FlutterBluetoothSerial _serial;
 
   BluetoothServiceInteractor(this._serial);
 
   @override
-  Future<ConnectedDevice> connect(Device device) async {
+  Future<ConnectedDevice<BluetoothConnection>> connect(Device device) async {
     try {
       final BluetoothConnection conn =
           await BluetoothConnection.toAddress(device.address);
