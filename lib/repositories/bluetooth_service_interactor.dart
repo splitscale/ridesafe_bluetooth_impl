@@ -3,10 +3,10 @@ import 'package:ridesafe_core/device/device.dart';
 import 'package:ridesafe_core/connected_device/connected_device.dart';
 import 'package:ridesafe_core/exceptions/service_exception.dart';
 import 'package:ridesafe_core/services/device_service.dart';
-import 'package:ridesafe_core/services/state/service_state.dart';
 
 /// bluetooth specific implementation
-class BluetoothServiceInteractor implements DeviceService {
+class BluetoothServiceInteractor
+    implements DeviceService<Future<BluetoothState>> {
   final FlutterBluetoothSerial _serial;
 
   BluetoothServiceInteractor(this._serial);
@@ -40,11 +40,9 @@ class BluetoothServiceInteractor implements DeviceService {
   }
 
   @override
-  Future<ServiceStatus> getServiceState() async {
+  Future<BluetoothState> getServiceState() async {
     try {
-      final state = await _serial.state;
-
-      return ServiceStatus<BluetoothState>(state);
+      return _serial.state;
     } catch (e) {
       throw ServiceException('Error while getting service state: $e');
     }
