@@ -22,11 +22,16 @@ class BluetoothConnectedDeviceService implements ConnectedDeviceService {
 
   @override
   bool get isConnected {
+    bool status = false;
+
     try {
-      return _device.connection.isConnected;
+      status = _device.connection.isConnected;
     } catch (e) {
+      status = false;
       throw ServiceException('get connection status Failed: $e');
     }
+
+    return status;
   }
 
   @override
